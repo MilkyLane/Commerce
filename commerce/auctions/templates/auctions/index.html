@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Active Listings</h2>
+
+    <div class="container">
+        <div class="row">
+            {% for listing in listings %}
+                {% if not listing.closed %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h3 class="card-title"><a href="{% url 'listings' listing.id %}">{{ listing.title }}</a></h3>
+                                <p class="card-text">{{ listing.description }}</p>
+                                <p class="card-text">Current Price: ${{ listing.sBid }}</p>
+                                {% if listing.image_url %}
+                                    <img class="card-img-top" src="{{ listing.image_url }}" alt="{{ listing.title }}" width="100%" height="200">
+                                {% endif %}
+                                <form action="{% url 'toggle_watchlist' listing.id %}" method="post">
+                                    {% csrf_token %}
+                                    {% if listing in watchlist_listings %}
+                                        <button type="submit" class="btn btn-info">Remove from Watchlist</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-info">Add to Watchlist</button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if forloop.counter|divisibleby:3 and not forloop.last %}
+                    </div><div class="row">
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

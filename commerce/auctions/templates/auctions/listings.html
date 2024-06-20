@@ -1,0 +1,59 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h1>{{ listing.title }}</h1>
+<p>{{ listing.description }}</p>
+<p>Starting Price: ${{ listing.sBid }}</p>
+{% if high_bid %}
+    <p>Current bid: ${{ high_bid.amount }}</p>
+{% else %}
+   <p> No bids yet</p>
+{% endif %}
+
+{% if listing.image_url %}
+  <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="300" height="250">
+{% endif %}
+<br>
+
+{% if not listing.closed %}
+<form action="{% url 'listings' listing.id %}" method="POST" name="bid_form">
+    {% csrf_token %}
+    <input type="number" name="bid" placeholder="Enter your bid">
+    <button type="submit" class="btn btn-outline-danger">Place Bid</button>
+     <br>
+<label for="comment">Comment:</label>
+<textarea id="comment" type="text" name="comment" rows="4" cols="50"></textarea>
+
+</form>
+{% if can_close_auction %}
+<form action="{% url 'close' listing.id %}" method="POST" name="close_form">
+    {% csrf_token %}
+    <button type="submit" name="close_auction" class="btn btn-danger">Close Auction</button>
+</form>
+{% endif %}
+{% endif %}
+
+<div class="alert alert-success" role="alert">
+{% if user_has_won %}
+<h2>Congratulations! You won the auction!</h2>
+{% endif %}
+</div>
+
+<h2>Comments</h2>
+{% if comments %}
+    <ul>
+        {% for comment in comments %}
+            <li>
+                <b>{{ comment.user.username }}</b> ({{ comment.timestamp|timesince }})<br>
+                {{ comment.content }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No comments yet.</p>
+{% endif %}
+{% endblock %}
+
+
+
